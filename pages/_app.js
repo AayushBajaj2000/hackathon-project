@@ -7,9 +7,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider>
       <div className="relative overflow-x-clip">
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <Component {...pageProps} />
       </div>
     </ChakraProvider>
   );

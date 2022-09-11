@@ -14,10 +14,6 @@ body {
   overflow-x: hidden;
 }
 
-* {
-  background-color: antiquewhite;
-}
-
 .row {
   position: relative;
 }
