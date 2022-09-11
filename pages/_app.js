@@ -6,9 +6,11 @@ import { ChakraProvider } from "@chakra-ui/react";
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <div className="relative overflow-x-clip">
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </div>
     </ChakraProvider>
   );
 }

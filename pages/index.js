@@ -1,10 +1,11 @@
 import { Button, Input } from "@chakra-ui/react";
 import React from "react";
+import Carousel from "../components/carousel";
 
 function Home() {
   return (
     <div className="px-2">
-      <p>Hello</p>
+      <Carousel />
       <div className="fixed bottom-0 left-0 w-full flex justify-center">
         <Input
           placeholder="send message"
