@@ -3,12 +3,12 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDY0btPmkUw1kMeeutMc_h3Mph12mJnfXM",
-  authDomain: "omega-f42bc.firebaseapp.com",
-  projectId: "omega-f42bc",
-  storageBucket: "omega-f42bc.appspot.com",
-  messagingSenderId: "420195828639",
-  appId: "1:420195828639:web:06b2fdfd23bdd8c0f6f3aa",
+  apiKey: process.env.API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGE_ID,
+  appId: process.env.APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
