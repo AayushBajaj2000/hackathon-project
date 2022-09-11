@@ -1,12 +1,5 @@
-import db from "@utils/db";
-import {
-  getDocs,
-  query,
-  collection,
-  addDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { db } from "@utils/db";
+import { getDocs, query, collection, addDoc } from "firebase/firestore";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -28,13 +21,6 @@ export default async function handler(req, res) {
       createdAt: new Date(),
       username: user,
     });
-
-    // update the current idea
-    const meetingRef = doc(db, "Meetings", id);
-    await updateDoc(meetingRef, {
-      currentIdea: docSnap.id,
-    });
-
     res.status(200).json({ id: docSnap.id });
   }
 }

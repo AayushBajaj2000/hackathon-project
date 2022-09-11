@@ -25,7 +25,6 @@ const Navbar = ({ info }) => {
           </p>
         </div>
         <div className="flex items-center">
-          <p className="font-bold text-lg">Username</p>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

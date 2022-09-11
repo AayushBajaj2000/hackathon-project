@@ -1,6 +1,10 @@
+import { collection, onSnapshot } from "firebase/firestore";
 import { motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
 import { useSwipeable } from "react-swipeable";
+import { db } from "@utils/db";
+import { Button, ButtonGroup } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 const config = {
   delta: 10, // min distance(px) before a swipe starts. *See Notes*
@@ -10,9 +14,11 @@ const config = {
   rotationAngle: 0, // set a rotation angle
 };
 
-const Carousel = ({ id, currentIdea }) => {
+const Carousel = ({ id, currentIdea, position, positionSet }) => {
   const [ideas, setIdeas] = useState([]);
-  const [position, positionSet] = useState(0);
+  const [current, setCurrent] = useState();
+  const router = useRouter();
+
   let fetchedData = false;
 
   const handlers = useSwipeable({
@@ -39,8 +45,45 @@ const Carousel = ({ id, currentIdea }) => {
     setIdeas(data.ideas);
   };
 
+  const updateRating = async (rating) => {
+    const data = fetch(`/api/meeting/ideas/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ideaId: currentIdea,
+        meetingId: router.query.id,
+        rating: rating,
+      }),
+    });
+  };
+
+  const updateCurrent = async (id) => {
+    const data = fetch(`/api/meeting/updateIdea`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        currentIdea: id,
+        meetingId: router.query.id,
+      }),
+    });
+  };
+
   useEffect(() => {
     if (id && !fetchedData) {
+      const unsubscribe_two = onSnapshot(
+        collection(db, "Meetings/" + id + "/Ideas"),
+        (docSnapshot) => {
+          const ideas = [];
+          docSnapshot.forEach((doc) => {
+            ideas.push({ data: doc.data(), id: doc.id });
+          });
+          setIdeas(ideas);
+        }
+      );
       getData(id);
       fetchedData = true;
     }
@@ -49,8 +92,16 @@ const Carousel = ({ id, currentIdea }) => {
   useEffect(() => {
     // find the index of the current idea
     const index = ideas.findIndex((idea) => idea.id === currentIdea);
-    positionSet(index);
+    if (index !== -1) {
+      positionSet(index);
+      setCurrent(ideas[index]);
+    } else {
+      positionSet(0);
+      setCurrent(ideas[0]);
+    }
   }, [currentIdea]);
+
+  console.log(current);
 
   return (
     <>
@@ -91,16 +142,48 @@ const Carousel = ({ id, currentIdea }) => {
           </motion.div>
         ))}
       </div>
-      <button
-        className="absolute bottom-0 left-0"
-        onClick={() => {
-          if (position < ideas.length - 1) {
-            positionSet(position + 1);
-          }
-        }}
-      >
-        Next Idea
-      </button>
+      <div className="fixed flex flex-col bottom-[300px] text-xl font-bold left-1/2 transform -translate-x-1/2 mb-4">
+        <p className="ml-[80px]">Rank the idea</p>
+        <div>
+          {[1, 2, 3, 4, 5].map((num) => (
+            <Button
+              key={num}
+              className="text-xl font-bold mt-4 mx-2"
+              onClick={() => {
+                updateRating(num);
+              }}
+            >
+              {num}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {position === ideas.length - 1 ? (
+        <Button
+          onClick={() => {
+            router.push(`/meeting/${id}/results`);
+          }}
+          className="fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4"
+          colorScheme="blue"
+        >
+          Results
+        </Button>
+      ) : (
+        <Button
+          onClick={() => {
+            if (position < ideas.length - 1) {
+              positionSet(position + 1);
+              // setCurrent(ideas[position + 1]);
+              updateCurrent(ideas[position + 1].id);
+            }
+          }}
+          className="fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4"
+          colorScheme="blue"
+        >
+          Next Idea
+        </Button>
+      )}
     </>
   );
 };
