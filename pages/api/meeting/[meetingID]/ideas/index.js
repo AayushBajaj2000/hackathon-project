@@ -3,7 +3,7 @@ import { getDocs, query, collection } from "firebase/firestore";
 
 
 export default async function handler(req, res) {
-    const docRef = collection(db, "Meetings/" + req.query.ID + "/Ideas")
+    const docRef = collection(db, "Meetings/" + req.query.meetingID + "/Ideas")
     const docc = query(docRef)
     const querySnapshot = await getDocs(docc);
     const ideas = []
