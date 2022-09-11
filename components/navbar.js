@@ -2,14 +2,26 @@ import Link from "next/link";
 import React from "react";
 import CenterScreen from "@utils/CenterScreen";
 
-const Navbar = () => {
+const getStatus = (status) => {
+  switch (status) {
+    case 0:
+      return "Voting...";
+    case 1:
+      return "Discussion...";
+    default:
+      return "Ended";
+  }
+};
+
+const Navbar = ({ info }) => {
   return (
     <nav className="px-4 w-full flex justify-center items-center h-[80px]">
       <div className="w-full flex justify-between">
         <div className="flex flex-col">
-          <p className="font-bold text-lg">Team Name</p>
+          <p className="font-bold text-lg">{info?.team_name}</p>
           <p className="font-bold text-lg">
-            State: <span className="font-normal">Voting...</span>
+            State:{" "}
+            <span className="font-normal">{getStatus(info?.status)}</span>
           </p>
         </div>
         <div className="flex items-center">

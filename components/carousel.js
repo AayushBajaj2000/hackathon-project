@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSwipeable } from "react-swipeable";
 
-const testIdeas = ["test1", "test2", "test3", "test4"];
 const config = {
   delta: 10, // min distance(px) before a swipe starts. *See Notes*
   preventDefaultTouchmoveEvent: false, // call e.preventDefault *See Details*
@@ -11,8 +10,11 @@ const config = {
   rotationAngle: 0, // set a rotation angle
 };
 
-const Carousel = () => {
+const Carousel = ({ id, currentIdea }) => {
+  const [ideas, setIdeas] = useState([]);
   const [position, positionSet] = useState(0);
+  let fetchedData = false;
+
   const handlers = useSwipeable({
     onSwiped: (eventData) => {
       const dir = eventData.dir;
@@ -31,13 +33,35 @@ const Carousel = () => {
     ...config,
   });
 
+  const getData = async (id) => {
+    const test = await fetch(`/api/meeting/ideas?id=${id}`);
+    const data = await test.json();
+    setIdeas(data.ideas);
+  };
+
+  useEffect(() => {
+    if (id && !fetchedData) {
+      getData(id);
+      fetchedData = true;
+    }
+  }, [id]);
+
+  useEffect(() => {
+    // find the index of the current idea
+    const index = ideas.findIndex((idea) => idea.id === currentIdea);
+    positionSet(index);
+  }, [currentIdea]);
+
   return (
     <>
       <div
         {...handlers}
-        className="absolute left-[10%] top-[24vh] sm:left-[20%] md:left-[37%] bg-black mt-[100px]"
+        style={{
+          transform: "translate(-50%, -50%)", // center the div
+        }}
+        className="absolute left-[calc(50%-210px)] top-[24vh] bg-black mt-[100px]"
       >
-        {testIdeas.map((test, index) => (
+        {ideas.map((idea, index) => (
           <motion.div
             className="container"
             key={index}
@@ -61,8 +85,8 @@ const Carousel = () => {
               duration: 1,
             }}
           >
-            <div className="min-w-[300px] h-[180px] bg-[rgba(164,199,243,0.5)] rounded-xl  text-black mx-5">
-              {test}
+            <div className="min-w-[300px] p-4 h-[180px] bg-[rgba(164,199,243,0.5)] rounded-xl  text-black mx-5">
+              {idea?.data?.text}
             </div>
           </motion.div>
         ))}
@@ -70,7 +94,7 @@ const Carousel = () => {
       <button
         className="absolute bottom-0 left-0"
         onClick={() => {
-          if (position < testIdeas.length - 1) {
+          if (position < ideas.length - 1) {
             positionSet(position + 1);
           }
         }}
